@@ -29,6 +29,8 @@ root@metasploitable:/# uid=0(root) gid=0(root) groups=0(root)
 
 Root access, no password, no exploit needed. Anyone on the network who can reach that port already owns the box.
 
+![Bind Shell Backdoor finding](screenshots/13-finding-bind-shell.png)
+
 **Fix:** Kill the process on port 1524 immediately. Figure out how it got there — if there's any doubt, treat the host as compromised and rebuild rather than patch around it.
 
 ---
@@ -38,6 +40,8 @@ Root access, no password, no exploit needed. Anyone on the network who can reach
 **Critical — CVSS 9.8**
 
 The host accepts SSL 2.0 and 3.0 connections. Both have known cryptographic holes and are vulnerable to attacks like POODLE, where an attacker on the network tricks a connection into using the weaker protocol so it can be cracked.
+
+![SSL v2/v3 finding](screenshots/14-finding-ssl-v2v3.png)
 
 **Fix:** Disable SSL 2.0 and 3.0 entirely. Only allow TLS 1.2+. Re-scan to confirm.
 
@@ -54,6 +58,8 @@ The following shares have no access restrictions:
 
 The entire filesystem is shared with no limits on who can connect — any host on the network can mount and read it.
 
+![NFS World Readable finding](screenshots/15-finding-nfs.png)
+
 **Fix:** Edit `/etc/exports`, restrict shares to specific trusted hosts, stop exporting the root filesystem. Only share what actually needs to be shared.
 
 ---
@@ -63,6 +69,8 @@ The entire filesystem is shared with no limits on who can connect — any host o
 **Low — CVSS 3.7**
 
 The server allows a Diffie-Hellman key exchange with only a 512-bit modulus — well below the modern minimum. Nessus flags the difficulty of exploiting this as "Easy," which is worth taking seriously even at Low severity.
+
+![Logjam finding](screenshots/16-finding-logjam.png)
 
 **Fix:** Bump the DH modulus to 2048 bits or higher, drop any EXPORT-grade cipher suites.
 
@@ -75,6 +83,8 @@ The server allows a Diffie-Hellman key exchange with only a 512-bit modulus — 
 This didn't show up until credentials were added. One grouped result, "Canonical Ubuntu Linux (Multiple Issues)," breaks down into 229 separate advisories — kernel, Samba, OpenSSL, GnuTLS, libxml2, and more — none of which were ever patched.
 
 An uncredentialed scan can see a service is running and maybe guess its version, but it can't check what's actually installed against known security advisories. That only happens with login access.
+
+![229 unpatched Ubuntu packages](screenshots/18-finding-ubuntu-patches.png)
 
 **Fix:** Run a full system update rather than patching one advisory at a time. Re-scan credentialed afterward to confirm the count drops, then put the host on a regular patch schedule.
 
